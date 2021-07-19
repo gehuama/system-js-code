@@ -1,0 +1,6 @@
+{
+    "presets": [ // 预设
+        "@babel/preset-env", //把ES6转化成ES5
+        "@babel/preset-react" // 解析jsx语法
+    ]
+}

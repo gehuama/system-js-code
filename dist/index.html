@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- react  react-dom 没有被打包 因此需要用systemJS 这种模式引入 
+        react  react-dom 没有被打包原因：未来子应用可能有多个都用react 这样就会因多个react因此公共模块应该提出来 -->
+    <!-- 公共模块必须 写到  system cdn前面 -->
+    <script type="systemjs-importmap">
+        {
+            "imports":{
+                "react":"https://cdn.bootcdn.net/ajax/libs/react/17.0.2/umd/react.production.min.js",
+                "react-dom": "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"
+            }
+        }
+    </script>
+    <div id="root"></div>
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/systemjs/6.10.1/system.min.js"></script> -->
+    <script>
+        // 这里可以动态加载模块 可以加载远程链接
+        // ADM 依赖前置 引入index.js时候 需要先加载 react react-dom 加载方式采用 systemJS方式
+
+        function SystemJS() {
+
+        }
+        function load(id){
+            return new Promise((resolve, reject)=>{
+                // 创建一个script 异步加载文件 
+                const script = document.createElement("script");
+                script.src = id;
+                script.async = true;
+                document.head.appendChild(script);
+                script.addEventListener("load", function(){
+                    console.log("脚本加载完成");
+                })
+            })
+        }
+        SystemJS.prototype.import = function (id) {
+            return new Promise((resolve, reject) => {
+                const lastSepIndex = window.location.href.lastIndexOf('/');
+                const baseUrl = location.href.slice(0, lastSepIndex + 1);
+                if(id.startsWith("./")){
+                    resolve(baseUrl + id.slice(2));
+                }
+            }).then((id)=>{ // 怎么加载js文件呢？script / fetch +eval
+                return load(id);
+            })
+        }
+        let System = new SystemJS();
+        System.import('./index.js').then(() => { })
+    </script>
+</body>
+
+</html>
